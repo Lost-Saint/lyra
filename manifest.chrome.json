@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "Lyra",
+  "author": "Lost Saint",
+  "version": "1.0.0",
+  "description": "Lets you fix annoying sound problems in YouTube videos and such. Like audio in one channel only, too quiet or too loud",
+  "icons": {
+    "48": "assets/icons/icon.svg",
+    "96": "assets/icons/icon.svg"
+  },
+  "permissions": ["activeTab", "webNavigation"],
+  "action": {
+    "default_icon": "assets/icons/icon.svg",
+    "default_title": "Lyra",
+    "default_popup": "src/popup.html"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
+}
