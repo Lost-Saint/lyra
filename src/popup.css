@@ -12,6 +12,74 @@ html {
 #elements-pane {
   max-width: 360px;
 }
+
+#global-settings {
+  background: rgb(250, 250, 250);
+  margin: 0;
+  padding: 1rem 1rem 0.6rem;
+  border-bottom: 1px solid rgb(235, 235, 235);
+}
+
+#global-settings h2 {
+  margin: 0 0 0.8rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+#page-controls h2 {
+  background: rgb(250, 250, 250);
+  margin: 0;
+  padding: 1rem 1rem 0.2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-bottom: 1px solid rgb(235, 235, 235);
+}
+
+#domain-settings {
+  margin-top: 1rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid rgb(235, 235, 235);
+}
+
+.domain-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+
+#current-domain {
+  font-family: monospace;
+  font-size: 0.9em;
+  color: #666;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#save-domain-override,
+#clear-domain-override {
+  background: transparent;
+  color: inherit;
+  border-radius: 5px;
+  border: 1px solid #aaa;
+  padding: 0.3em 0.6em;
+  font-size: 0.85em;
+  cursor: pointer;
+}
+
+#save-domain-override:hover,
+#clear-domain-override:hover {
+  background: rgba(69, 69, 69, 0.1);
+}
+
+#save-domain-override:active,
+#clear-domain-override:active {
+  background: rgba(69, 69, 69, 0.3);
+}
 header {
   display: flex;
   align-items: center;
@@ -137,15 +205,23 @@ label input[type="number"] {
   #elements-list,
   #all-elements,
   #individual-elements,
+  #global-settings,
+  #page-controls h2,
   .info {
     background: rgb(40, 40, 40);
   }
   #elements-list li,
   #all-elements,
-  #individual-elements {
+  #individual-elements,
+  #global-settings,
+  #page-controls h2,
+  #domain-settings {
     border-color: rgb(70, 70, 70);
   }
   .info {
+    color: #aaa;
+  }
+  #current-domain {
     color: #aaa;
   }
 }

@@ -2,7 +2,9 @@
 
 Lyra is a browser extension that helps fix annoying sound problems in YouTube videos and other media. It allows you to:
 
-- Adjust gain (volume)
+- Set global gain (volume) that applies across all websites
+- Override gain for specific domains
+- Adjust gain (volume) per page or per media element
 - Adjust pan (left/right balance)
 - Convert stereo to mono
 - Flip left and right channels
@@ -11,7 +13,10 @@ This extension is perfect for those times when videos have audio in one channel 
 
 ## Features
 
-- **Global Controls**: Apply audio adjustments to all media elements on a page at once
+- **Global Gain Settings**: Set a default volume boost that applies to all websites
+- **Per-Domain Overrides**: Customize gain settings for specific domains (e.g., YouTube, Netflix)
+- **Persistent Settings**: Your preferences are saved and automatically applied
+- **Page Controls**: Apply audio adjustments to all media elements on a page at once
 - **Individual Controls**: Fine-tune specific audio/video elements separately
 - **Dark Mode Support**: Automatically adapts to your browser's theme
 - **Real-time Adjustments**: Changes are applied instantly as you adjust sliders
@@ -86,19 +91,33 @@ The extension can be built for both Firefox and Chrome-based browsers using the 
 
 ## Usage
 
-1. Click the Lyra icon in your browser toolbar when viewing media content
-2. Use the sliders and checkboxes to adjust audio properties:
+### Global Settings
+1. Click the Lyra icon in your browser toolbar
+2. Set your **Global Gain** (default: 1.5x) - this applies to all websites
+3. Optionally create **Domain Overrides** for specific sites:
+   - Adjust the domain gain slider to your preferred level
+   - Click "Save Override" to save settings for the current domain
+   - Click "Clear Override" to remove domain-specific settings
+
+### Page Controls
+1. Use the **Current Page Controls** to adjust all media on the current page:
    - **Gain**: Increase or decrease volume
    - **Pan**: Adjust balance between left and right channels
    - **Mono**: Convert stereo to mono (fixes "audio in one ear" issues)
    - **Flip L/R**: Swap left and right audio channels
-3. Use the "Reset" button to revert to default settings
-4. Individual media elements can be adjusted separately using the "Control individual media elements" section
+2. Use the "Reset" button to revert to saved global/domain settings
+3. Individual media elements can be adjusted separately using the "Control individual media elements" section
+
+### Settings Persistence
+- Global gain settings are saved automatically and apply to all new tabs
+- Domain overrides are saved per-domain and take precedence over global settings
+- Page-level adjustments are temporary and reset when you reload the page
 
 ## Limitations
 
 - Due to browser security restrictions, the extension cannot modify audio from cross-origin media sources (media hosted on different domains)
-- The extension's effects are reset when the page is reloaded
+- Page-level adjustments (beyond saved global/domain settings) are reset when the page is reloaded
+- Global and domain settings persist across browser sessions
 
 ## License
 

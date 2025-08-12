@@ -4,7 +4,7 @@
 
 <div id="elements-pane">
     <header>
-        <h1>SoundFixer</h1>
+        <h1>Lyra</h1>
         <a
             href="https://patreon.com/valpackett"
             class="info-opener"
@@ -24,6 +24,56 @@
                 title="View on GitHub"
         /></a>
     </header>
+
+    <section id="global-settings">
+        <h2>Global Settings</h2>
+        <label>
+            <span>Global Gain</span>
+            <input
+                type="range"
+                id="global-gain"
+                min="0"
+                max="5"
+                step="0.05"
+                value="1.5"
+            />
+            <input
+                type="number"
+                id="global-gain-num"
+                value="1.5"
+                min="0"
+                max="69"
+                step="0.05"
+            />
+        </label>
+
+        <div id="domain-settings">
+            <label>
+                <span>Domain Override</span>
+                <input
+                    type="range"
+                    id="domain-gain"
+                    min="0"
+                    max="5"
+                    step="0.05"
+                    value="1"
+                />
+                <input
+                    type="number"
+                    id="domain-gain-num"
+                    value="1"
+                    min="0"
+                    max="69"
+                    step="0.05"
+                />
+            </label>
+            <div class="domain-controls">
+                <span id="current-domain"></span>
+                <button id="save-domain-override">Save Override</button>
+                <button id="clear-domain-override">Clear Override</button>
+            </div>
+        </div>
+    </section>
     <template id="elements-tpl">
         <div class="header-row">
             <div class="element-label"></div>
@@ -76,7 +126,10 @@
             </label>
         </div>
     </template>
-    <div id="all-elements"></div>
+    <section id="page-controls">
+        <h2>Current Page Controls</h2>
+        <div id="all-elements"></div>
+    </section>
     <details id="individual-elements">
         <summary>Control individual media elements</summary>
         <ul id="elements-list"></ul>

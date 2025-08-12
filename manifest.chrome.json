@@ -8,7 +8,7 @@
     "48": "assets/icons/icon.svg",
     "96": "assets/icons/icon.svg"
   },
-  "permissions": ["activeTab", "webNavigation"],
+  "permissions": ["activeTab", "webNavigation", "storage"],
   "action": {
     "default_icon": "assets/icons/icon.svg",
     "default_title": "Lyra",

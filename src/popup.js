@@ -15,8 +15,18 @@
  * @property {SoundSettings} [settings] - Current sound settings for the element
  */
 
+/**
+ * @typedef {Object} GlobalSettings
+ * @property {number} globalGain - Global gain multiplier (default: 1.5)
+ * @property {Object.<string, number>} domainOverrides - Domain-specific gain overrides
+ */
+
 // Tab ID of the current tab
 let tid = 0;
+// Current tab URL for domain detection
+let currentUrl = "";
+// Global settings loaded from storage
+let globalSettings = { globalGain: 1.5, domainOverrides: {} };
 // Map from frame ID to map of media elements
 /** @type {Map<number, Map<string, MediaElement>>} */
 const frameMap = new Map();
@@ -24,6 +34,84 @@ const elementsList = document.getElementById("elements-list");
 const allElements = document.getElementById("all-elements");
 const indivElements = document.getElementById("individual-elements");
 const elementsTpl = document.getElementById("elements-tpl");
+
+// Global settings UI elements
+const globalGainSlider = document.getElementById("global-gain");
+const globalGainNumber = document.getElementById("global-gain-num");
+const domainGainSlider = document.getElementById("domain-gain");
+const domainGainNumber = document.getElementById("domain-gain-num");
+const currentDomainSpan = document.getElementById("current-domain");
+const saveDomainBtn = document.getElementById("save-domain-override");
+const clearDomainBtn = document.getElementById("clear-domain-override");
+
+/**
+ * Load global settings from browser storage
+ * @returns {Promise<GlobalSettings>}
+ */
+async function loadGlobalSettings() {
+    try {
+        const result = await browser.storage.sync.get(["lyra_settings"]);
+        if (result.lyra_settings) {
+            return { ...globalSettings, ...result.lyra_settings };
+        }
+    } catch (error) {
+        console.warn("Failed to load settings:", error);
+    }
+    return globalSettings;
+}
+
+/**
+ * Save global settings to browser storage
+ * @param {GlobalSettings} settings
+ */
+async function saveGlobalSettings(settings) {
+    try {
+        await browser.storage.sync.set({ lyra_settings: settings });
+        globalSettings = settings;
+    } catch (error) {
+        console.error("Failed to save settings:", error);
+    }
+}
+
+/**
+ * Get the domain from a URL
+ * @param {string} url
+ * @returns {string}
+ */
+function getDomain(url) {
+    try {
+        return new URL(url).hostname;
+    } catch {
+        return "unknown";
+    }
+}
+
+/**
+ * Get the effective gain for the current domain
+ * @returns {number}
+ */
+function getEffectiveGain() {
+    const domain = getDomain(currentUrl);
+    return globalSettings.domainOverrides[domain] || globalSettings.globalGain;
+}
+
+/**
+ * Update the global settings UI
+ */
+function updateGlobalSettingsUI() {
+    const domain = getDomain(currentUrl);
+    const effectiveGain = getEffectiveGain();
+    const hasOverride = domain in globalSettings.domainOverrides;
+
+    globalGainSlider.value = globalSettings.globalGain;
+    globalGainNumber.value = globalSettings.globalGain;
+
+    domainGainSlider.value = effectiveGain;
+    domainGainNumber.value = effectiveGain;
+
+    currentDomainSpan.textContent = domain;
+    clearDomainBtn.style.display = hasOverride ? "inline-block" : "none";
+}
 
 /**
  * Applies sound modification settings to a specific media element
@@ -91,52 +179,163 @@ function applySettings(fid, elid, newSettings) {
 }
 
 /**
+ * Initialize global settings event handlers
+ */
+function initializeGlobalSettings() {
+    // Global gain slider
+    globalGainSlider.addEventListener("input", async () => {
+        globalSettings.globalGain = parseFloat(globalGainSlider.value);
+        globalGainNumber.value = globalGainSlider.value;
+        await saveGlobalSettings(globalSettings);
+
+        // Apply to current page if no domain override
+        const domain = getDomain(currentUrl);
+        if (!(domain in globalSettings.domainOverrides)) {
+            applyGainToAllElements(globalSettings.globalGain);
+        }
+    });
+
+    globalGainNumber.addEventListener("input", async function () {
+        if (+this.value > +this.getAttribute("max"))
+            this.value = this.getAttribute("max");
+        if (+this.value < +this.getAttribute("min"))
+            this.value = this.getAttribute("min");
+
+        globalSettings.globalGain = parseFloat(this.value);
+        globalGainSlider.value = this.value;
+        await saveGlobalSettings(globalSettings);
+
+        // Apply to current page if no domain override
+        const domain = getDomain(currentUrl);
+        if (!(domain in globalSettings.domainOverrides)) {
+            applyGainToAllElements(globalSettings.globalGain);
+        }
+    });
+
+    // Domain override sliders
+    domainGainSlider.addEventListener("input", () => {
+        domainGainNumber.value = domainGainSlider.value;
+        applyGainToAllElements(parseFloat(domainGainSlider.value));
+    });
+
+    domainGainNumber.addEventListener("input", function () {
+        if (+this.value > +this.getAttribute("max"))
+            this.value = this.getAttribute("max");
+        if (+this.value < +this.getAttribute("min"))
+            this.value = this.getAttribute("min");
+
+        domainGainSlider.value = this.value;
+        applyGainToAllElements(parseFloat(this.value));
+    });
+
+    // Save domain override button
+    saveDomainBtn.addEventListener("click", async () => {
+        const domain = getDomain(currentUrl);
+        const gainValue = parseFloat(domainGainSlider.value);
+
+        globalSettings.domainOverrides[domain] = gainValue;
+        await saveGlobalSettings(globalSettings);
+        updateGlobalSettingsUI();
+    });
+
+    // Clear domain override button
+    clearDomainBtn.addEventListener("click", async () => {
+        const domain = getDomain(currentUrl);
+        delete globalSettings.domainOverrides[domain];
+        await saveGlobalSettings(globalSettings);
+        updateGlobalSettingsUI();
+
+        // Apply global gain instead
+        applyGainToAllElements(globalSettings.globalGain);
+    });
+}
+
+/**
+ * Apply gain to all media elements on the page
+ * @param {number} gainValue
+ */
+function applyGainToAllElements(gainValue) {
+    for (const [fid, els] of frameMap) {
+        for (const [elid, el] of els) {
+            applySettings(fid, elid, { gain: gainValue });
+            // Update individual element UI sliders
+            const egain = document.querySelector(
+                `[data-fid="${fid}"][data-elid="${elid}"] .element-gain`,
+            );
+            if (egain) {
+                egain.value = gainValue;
+                egain.parentElement.querySelector(".element-gain-num").value =
+                    "" + gainValue;
+            }
+        }
+    }
+
+    // Update the "All elements" slider if it exists
+    const allGain = document.querySelector("#all-elements .element-gain");
+    if (allGain) {
+        allGain.value = gainValue;
+        allGain.parentElement.querySelector(".element-gain-num").value =
+            "" + gainValue;
+    }
+}
+
+/**
  * Initialize the popup by:
- * 1. Finding all audio/video elements in the current tab
- * 2. Setting up controls for each element
- * 3. Creating a master control panel for all elements
+ * 1. Loading global settings
+ * 2. Finding all audio/video elements in the current tab
+ * 3. Setting up controls for each element
+ * 4. Creating a master control panel for all elements
+ * 5. Applying saved gain settings
  *
  * Uses browser.tabs and browser.webNavigation APIs to inject scripts
  * into all frames of the current tab.
  */
-browser.tabs
-    .query({ currentWindow: true, active: true })
-    .then((tabs) => {
-        tid = tabs[0].id;
-        return browser.webNavigation
-            .getAllFrames({ tabId: tid })
-            .then((frames) =>
-                Promise.all(
-                    frames.map((frame) => {
-                        const fid = frame.frameId;
-                        return browser.tabs
-                            .executeScript(tid, {
-                                frameId: fid,
-                                code: `(function () {
-				const result = new Map()
-				for (const el of document.querySelectorAll('video, audio')) {
-					if (!el.hasAttribute('data-x-soundfixer-id')) {
-						el.setAttribute('data-x-soundfixer-id',
-							Math.random().toString(36).substr(2, 10))
-					}
-					result.set(el.getAttribute('data-x-soundfixer-id'), {
-						type: el.tagName.toLowerCase(),
-						isPlaying: (el.currentTime > 0 && !el.paused && !el.ended && el.readyState > 2),
-						settings: el.xSoundFixerSettings
-					})
+async function initializePopup() {
+    // Load global settings first
+    globalSettings = await loadGlobalSettings();
+    initializeGlobalSettings();
+
+    const tabs = await browser.tabs.query({
+        currentWindow: true,
+        active: true,
+    });
+    tid = tabs[0].id;
+    currentUrl = tabs[0].url;
+    updateGlobalSettingsUI();
+
+    try {
+        const frames = await browser.webNavigation.getAllFrames({ tabId: tid });
+
+        await Promise.all(
+            frames.map((frame) => {
+                const fid = frame.frameId;
+                return browser.tabs
+                    .executeScript(tid, {
+                        frameId: fid,
+                        code: `(function () {
+			const result = new Map()
+			for (const el of document.querySelectorAll('video, audio')) {
+				if (!el.hasAttribute('data-x-soundfixer-id')) {
+					el.setAttribute('data-x-soundfixer-id',
+						Math.random().toString(36).substr(2, 10))
 				}
-				return result
-			})()`,
-                            })
-                            .then((result) => frameMap.set(fid, result[0]))
-                            .catch((err) =>
-                                console.error(`tab ${tid} frame ${fid}`, err),
-                            );
-                    }),
-                ),
-            );
-    })
-    .then((_) => {
+				result.set(el.getAttribute('data-x-soundfixer-id'), {
+					type: el.tagName.toLowerCase(),
+					isPlaying: (el.currentTime > 0 && !el.paused && !el.ended && el.readyState > 2),
+					settings: el.xSoundFixerSettings
+				})
+			}
+			return result
+		})()`,
+                    })
+                    .then((result) => frameMap.set(fid, result[0]))
+                    .catch((err) =>
+                        console.error(`tab ${tid} frame ${fid}`, err),
+                    );
+            }),
+        );
+
+        const effectiveGain = getEffectiveGain();
         elementsList.textContent = "";
         let elCount = 0;
         for (const [fid, els] of frameMap) {
@@ -245,8 +444,8 @@ browser.tabs
                 `All media on the page`;
             const gain = node.querySelector(".element-gain");
             const gainNumberInput = node.querySelector(".element-gain-num");
-            gain.value = 1;
-            gainNumberInput.value = "" + gain.value;
+            gain.value = effectiveGain;
+            gainNumberInput.value = "" + effectiveGain;
             /**
              * Applies gain value to all media elements on the page
              *
@@ -374,7 +573,7 @@ browser.tabs
                             `[data-fid="${fid}"][data-elid="${elid}"] .element-flip`,
                         ).checked = false;
                         applySettings(fid, elid, {
-                            gain: 1,
+                            gain: effectiveGain,
                             pan: 0,
                             mono: false,
                             flip: false,
@@ -383,5 +582,16 @@ browser.tabs
                 }
             };
             allElements.appendChild(node);
+
+            // Apply the effective gain to all elements on page load
+            applyGainToAllElements(effectiveGain);
         }
-    });
+    } catch (error) {
+        console.error("Failed to initialize popup:", error);
+        allElements.innerHTML =
+            "Error loading media elements. Please refresh the page and try again.";
+    }
+}
+
+// Initialize the popup
+initializePopup();
