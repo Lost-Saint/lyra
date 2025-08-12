@@ -91,27 +91,31 @@ The extension can be built for both Firefox and Chrome-based browsers using the 
 
 ## Usage
 
-### Global Settings
-1. Click the Lyra icon in your browser toolbar
-2. Set your **Global Gain** (default: 1.5x) - this applies to all websites
-3. Optionally create **Domain Overrides** for specific sites:
-   - Adjust the domain gain slider to your preferred level
-   - Click "Save Override" to save settings for the current domain
-   - Click "Clear Override" to remove domain-specific settings
+The extension features a clean tabbed interface with two main sections:
 
-### Page Controls
-1. Use the **Current Page Controls** to adjust all media on the current page:
+### Main Controls Tab
+1. **Global Gain**: Set a default volume boost (default: 1.5x) that applies to all websites
+   - This setting persists across browser sessions
+   - Automatically applied to all new tabs and media
+2. **Current Page Controls**: Adjust all media elements on the current page:
    - **Gain**: Increase or decrease volume
    - **Pan**: Adjust balance between left and right channels
    - **Mono**: Convert stereo to mono (fixes "audio in one ear" issues)
    - **Flip L/R**: Swap left and right audio channels
-2. Use the "Reset" button to revert to saved global/domain settings
-3. Individual media elements can be adjusted separately using the "Control individual media elements" section
+   - Use the "Reset" button to revert to saved global/domain settings
+3. **Individual Elements**: Expand the details section to fine-tune specific audio/video elements separately
+
+### Domain Settings Tab
+1. **Domain Override**: Create custom volume settings for specific websites
+   - View the current domain you're configuring
+   - Adjust the volume slider to your preferred level for this domain
+   - Click "Save Override" to save settings for the current domain
+   - Click "Clear Override" to remove domain-specific settings and use global gain instead
 
 ### Settings Persistence
-- Global gain settings are saved automatically and apply to all new tabs
-- Domain overrides are saved per-domain and take precedence over global settings
-- Page-level adjustments are temporary and reset when you reload the page
+- **Global Gain**: Saved permanently, applies to all websites by default
+- **Domain Overrides**: Saved per-domain (e.g., YouTube: 2.0x, Netflix: 1.2x) and take precedence over global settings
+- **Page Controls**: Temporary adjustments that reset when you reload the page
 
 ## Limitations
 

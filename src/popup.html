@@ -25,55 +25,78 @@
         /></a>
     </header>
 
-    <section id="global-settings">
-        <h2>Global Settings</h2>
-        <label>
-            <span>Global Gain</span>
-            <input
-                type="range"
-                id="global-gain"
-                min="0"
-                max="5"
-                step="0.05"
-                value="1.5"
-            />
-            <input
-                type="number"
-                id="global-gain-num"
-                value="1.5"
-                min="0"
-                max="69"
-                step="0.05"
-            />
-        </label>
-
-        <div id="domain-settings">
-            <label>
-                <span>Domain Override</span>
-                <input
-                    type="range"
-                    id="domain-gain"
-                    min="0"
-                    max="5"
-                    step="0.05"
-                    value="1"
-                />
-                <input
-                    type="number"
-                    id="domain-gain-num"
-                    value="1"
-                    min="0"
-                    max="69"
-                    step="0.05"
-                />
-            </label>
-            <div class="domain-controls">
-                <span id="current-domain"></span>
-                <button id="save-domain-override">Save Override</button>
-                <button id="clear-domain-override">Clear Override</button>
-            </div>
+    <div class="tab-container">
+        <div class="tab-buttons">
+            <button class="tab-button active" data-tab="main">
+                Main Controls
+            </button>
+            <button class="tab-button" data-tab="domain">
+                Domain Settings
+            </button>
         </div>
-    </section>
+
+        <div id="main-tab" class="tab-content active">
+            <section id="global-settings">
+                <h3>Global Gain</h3>
+                <label>
+                    <span>Volume</span>
+                    <input
+                        type="range"
+                        id="global-gain"
+                        min="0"
+                        max="5"
+                        step="0.05"
+                        value="1.5"
+                    />
+                    <input
+                        type="number"
+                        id="global-gain-num"
+                        value="1.5"
+                        min="0"
+                        max="69"
+                        step="0.05"
+                    />
+                </label>
+            </section>
+
+            <section id="page-controls">
+                <h3>Current Page Controls</h3>
+                <div id="all-elements"></div>
+            </section>
+        </div>
+
+        <div id="domain-tab" class="tab-content">
+            <section id="domain-settings">
+                <h3>Domain Override</h3>
+                <div class="domain-info">
+                    <span id="current-domain"></span>
+                </div>
+                <label>
+                    <span>Volume</span>
+                    <input
+                        type="range"
+                        id="domain-gain"
+                        min="0"
+                        max="5"
+                        step="0.05"
+                        value="1"
+                    />
+                    <input
+                        type="number"
+                        id="domain-gain-num"
+                        value="1"
+                        min="0"
+                        max="69"
+                        step="0.05"
+                    />
+                </label>
+                <div class="domain-controls">
+                    <button id="save-domain-override">Save Override</button>
+                    <button id="clear-domain-override">Clear Override</button>
+                </div>
+            </section>
+        </div>
+    </div>
     <template id="elements-tpl">
         <div class="header-row">
             <div class="element-label"></div>
@@ -126,10 +149,7 @@
             </label>
         </div>
     </template>
-    <section id="page-controls">
-        <h2>Current Page Controls</h2>
-        <div id="all-elements"></div>
-    </section>
+
     <details id="individual-elements">
         <summary>Control individual media elements</summary>
         <ul id="elements-list"></ul>

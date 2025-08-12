@@ -13,72 +13,118 @@ html {
   max-width: 360px;
 }
 
-#global-settings {
+.tab-container {
   background: rgb(250, 250, 250);
-  margin: 0;
-  padding: 1rem 1rem 0.6rem;
   border-bottom: 1px solid rgb(235, 235, 235);
 }
 
-#global-settings h2 {
-  margin: 0 0 0.8rem 0;
-  font-size: 1.1rem;
-  font-weight: 600;
-}
-
-#page-controls h2 {
-  background: rgb(250, 250, 250);
-  margin: 0;
-  padding: 1rem 1rem 0.2rem;
-  font-size: 1.1rem;
-  font-weight: 600;
-  border-bottom: 1px solid rgb(235, 235, 235);
-}
-
-#domain-settings {
-  margin-top: 1rem;
-  padding-top: 0.8rem;
-  border-top: 1px solid rgb(235, 235, 235);
-}
-
-.domain-controls {
+.tab-buttons {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-  flex-wrap: wrap;
+  border-bottom: 1px solid rgb(235, 235, 235);
+}
+
+.tab-button {
+  background: transparent;
+  border: none;
+  padding: 0.8rem 1.2rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  flex: 1;
+  color: #666;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.tab-button:hover {
+  background: rgba(69, 69, 69, 0.05);
+  color: inherit;
+}
+
+.tab-button.active {
+  color: #007acc;
+  border-bottom-color: #007acc;
+  background: rgb(250, 250, 250);
+}
+
+.tab-content {
+  display: none;
+  padding: 1rem;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+#global-settings,
+#page-controls,
+#domain-settings {
+  margin-bottom: 1.5rem;
+}
+
+#global-settings:last-child,
+#page-controls:last-child,
+#domain-settings:last-child {
+  margin-bottom: 0;
+}
+
+#global-settings h3,
+#page-controls h3,
+#domain-settings h3 {
+  margin: 0 0 0.8rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.domain-info {
+  margin-bottom: 0.8rem;
+  padding: 0.5rem 0.8rem;
+  background: rgba(0, 122, 204, 0.1);
+  border-radius: 5px;
+  border-left: 3px solid #007acc;
 }
 
 #current-domain {
   font-family: monospace;
   font-size: 0.9em;
-  color: #666;
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  color: #007acc;
+  font-weight: 500;
+}
+
+.domain-controls {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
 }
 
 #save-domain-override,
 #clear-domain-override {
-  background: transparent;
-  color: inherit;
+  background: #007acc;
+  color: white;
+  border: none;
   border-radius: 5px;
-  border: 1px solid #aaa;
-  padding: 0.3em 0.6em;
-  font-size: 0.85em;
+  padding: 0.5em 1em;
+  font-size: 0.9em;
   cursor: pointer;
+  transition: background 0.2s ease;
 }
 
-#save-domain-override:hover,
+#clear-domain-override {
+  background: #dc3545;
+}
+
+#save-domain-override:hover {
+  background: #0056b3;
+}
+
 #clear-domain-override:hover {
-  background: rgba(69, 69, 69, 0.1);
+  background: #c82333;
 }
 
 #save-domain-override:active,
 #clear-domain-override:active {
-  background: rgba(69, 69, 69, 0.3);
+  transform: translateY(1px);
 }
 header {
   display: flex;
@@ -205,23 +251,45 @@ label input[type="number"] {
   #elements-list,
   #all-elements,
   #individual-elements,
-  #global-settings,
-  #page-controls h2,
+  .tab-container,
   .info {
     background: rgb(40, 40, 40);
   }
   #elements-list li,
   #all-elements,
   #individual-elements,
-  #global-settings,
-  #page-controls h2,
-  #domain-settings {
+  .tab-container,
+  .tab-buttons {
     border-color: rgb(70, 70, 70);
   }
-  .info {
-    color: #aaa;
+  .tab-button {
+    color: #ccc;
+  }
+  .tab-button:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+  }
+  .tab-button.active {
+    color: #4db8ff;
+    background: rgb(40, 40, 40);
+    border-bottom-color: #4db8ff;
+  }
+  .tab-content {
+    background: rgb(40, 40, 40);
+  }
+  #global-settings h3,
+  #page-controls h3,
+  #domain-settings h3 {
+    color: #f0f0f0;
+  }
+  .domain-info {
+    background: rgba(77, 184, 255, 0.15);
+    border-left-color: #4db8ff;
   }
   #current-domain {
+    color: #4db8ff;
+  }
+  .info {
     color: #aaa;
   }
 }

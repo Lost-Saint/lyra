@@ -44,6 +44,10 @@ const currentDomainSpan = document.getElementById("current-domain");
 const saveDomainBtn = document.getElementById("save-domain-override");
 const clearDomainBtn = document.getElementById("clear-domain-override");
 
+// Tab switching elements
+const tabButtons = document.querySelectorAll(".tab-button");
+const tabContents = document.querySelectorAll(".tab-content");
+
 /**
  * Load global settings from browser storage
  * @returns {Promise<GlobalSettings>}
@@ -111,6 +115,30 @@ function updateGlobalSettingsUI() {
 
     currentDomainSpan.textContent = domain;
     clearDomainBtn.style.display = hasOverride ? "inline-block" : "none";
+}
+
+/**
+ * Initialize tab switching functionality
+ */
+function initializeTabs() {
+    tabButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+            const targetTab = button.getAttribute("data-tab");
+
+            // Remove active class from all buttons and contents
+            tabButtons.forEach((btn) => btn.classList.remove("active"));
+            tabContents.forEach((content) =>
+                content.classList.remove("active"),
+            );
+
+            // Add active class to clicked button and corresponding content
+            button.classList.add("active");
+            const targetContent = document.getElementById(`${targetTab}-tab`);
+            if (targetContent) {
+                targetContent.classList.add("active");
+            }
+        });
+    });
 }
 
 /**
@@ -291,6 +319,9 @@ function applyGainToAllElements(gainValue) {
  * into all frames of the current tab.
  */
 async function initializePopup() {
+    // Initialize tab switching
+    initializeTabs();
+
     // Load global settings first
     globalSettings = await loadGlobalSettings();
     initializeGlobalSettings();
