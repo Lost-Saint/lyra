@@ -29,9 +29,9 @@ check_icons() {
     echo '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" fill="#3030a0"/><path d="M24 10c-7.732 0-14 6.268-14 14s6.268 14 14 14 14-6.268 14-14-6.268-14-14-14zm-5 20.5v-13l12 6.5-12 6.5z" fill="black"/></svg>' > assets/icons/icon-inv.svg
   fi
 
-  if [ ! -f "assets/images/patreon.svg" ]; then
-    echo "Creating patreon.svg icon..."
-    echo '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#F96854" d="M14.82 2.41c3.96 0 7.18 3.24 7.18 7.22 0 3.97-3.22 7.2-7.18 7.2-3.97 0-7.2-3.23-7.2-7.2 0-3.98 3.23-7.22 7.2-7.22"/><path fill="#052D49" d="M2 21.6h3.5V2.4H2z"/></svg>' > assets/images/patreon.svg
+  if [ ! -f "assets/images/coffee.svg" ]; then
+    echo "Creating coffee.svg icon..."
+    echo '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#FFDD44" d="M7 14c0-1.86 1.28-3.41 3-3.86V9c-2.84.48-5 2.94-5 5.83V19h2v-5z"/><path fill="#FF813F" d="M18 9H8c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h8c3.31 0 6-2.69 6-6v-2c0-2.21-1.79-4-4-4zm2 6c0 2.21-1.79 4-4 4H8v-8h8c1.1 0 2 .9 2 2v2z"/><path fill="#5D4037" d="M12 6.5c.28 0 .5-.22.5-.5s-.22-.5-.5-.5-.5.22-.5.5.22.5.5.5z"/><path fill="#5D4037" d="M10 6.5c.28 0 .5-.22.5-.5s-.22-.5-.5-.5-.5.22-.5.5.22.5.5.5z"/><path fill="#5D4037" d="M14 6.5c.28 0 .5-.22.5-.5s-.22-.5-.5-.5-.5.22-.5.5.22.5.5.5z"/></svg>' > assets/images/coffee.svg
   fi
 }
 
@@ -43,7 +43,7 @@ build_firefox() {
   cp manifest.json LICENSE.md "$FIREFOX_DIR"
   cp src/popup.html src/popup.js src/popup.css "$FIREFOX_DIR/src"
   cp assets/icons/icon.svg assets/icons/icon-inv.svg "$FIREFOX_DIR/assets/icons"
-  cp assets/images/github.svg assets/images/patreon.svg "$FIREFOX_DIR/assets/images"
+  cp assets/images/github.svg assets/images/coffee.svg "$FIREFOX_DIR/assets/images"
 
   # Create XPI package
   cd "$FIREFOX_DIR" || exit
@@ -73,7 +73,7 @@ build_chrome() {
   cp LICENSE.md "$CHROME_DIR"
   cp src/popup.html src/popup.js src/popup.css "$CHROME_DIR/src"
   cp assets/icons/icon.svg assets/icons/icon-inv.svg "$CHROME_DIR/assets/icons"
-  cp assets/images/github.svg assets/images/patreon.svg "$CHROME_DIR/assets/images"
+  cp assets/images/github.svg assets/images/coffee.svg "$CHROME_DIR/assets/images"
 
   # Create ZIP package
   cd "$CHROME_DIR" || exit
