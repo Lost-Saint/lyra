@@ -3,7 +3,13 @@ html {
   background: rgb(235, 235, 235);
   color: rgb(60, 60, 60);
   margin: 0 auto;
+
+  @media screen and (prefers-color-scheme: dark) {
+    background: rgb(60, 60, 60);
+    color: rgb(240, 240, 240);
+  }
 }
+
 * {
   font-family: system-ui;
   user-select: none;
@@ -16,65 +22,93 @@ html {
 .tab-container {
   background: rgb(250, 250, 250);
   border-bottom: 1px solid rgb(235, 235, 235);
-}
 
-.tab-buttons {
-  display: flex;
-  border-bottom: 1px solid rgb(235, 235, 235);
-}
+  @media screen and (prefers-color-scheme: dark) {
+    background: rgb(40, 40, 40);
+    border-color: rgb(70, 70, 70);
+  }
 
-.tab-button {
-  background: transparent;
-  border: none;
-  padding: 0.8rem 1.2rem;
-  font-size: 0.95rem;
-  font-weight: 500;
-  cursor: pointer;
-  flex: 1;
-  color: #666;
-  border-bottom: 2px solid transparent;
-  transition: all 0.2s ease;
-}
+  & .tab-buttons {
+    display: flex;
+    border-bottom: 1px solid rgb(235, 235, 235);
 
-.tab-button:hover {
-  background: rgba(69, 69, 69, 0.05);
-  color: inherit;
-}
+    @media screen and (prefers-color-scheme: dark) {
+      border-color: rgb(70, 70, 70);
+    }
+  }
 
-.tab-button.active {
-  color: #007acc;
-  border-bottom-color: #007acc;
-  background: rgb(250, 250, 250);
-}
+  & .tab-button {
+    background: transparent;
+    border: none;
+    padding: 0.8rem 1.2rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    flex: 1;
+    color: #666;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
 
-.tab-content {
-  display: none;
-  padding: 1rem;
-}
+    &:hover {
+      background: rgba(69, 69, 69, 0.05);
+      color: inherit;
+    }
 
-.tab-content.active {
-  display: block;
+    &.active {
+      color: #007acc;
+      border-bottom-color: #007acc;
+      background: rgb(250, 250, 250);
+    }
+
+    @media screen and (prefers-color-scheme: dark) {
+      color: #ccc;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: white;
+      }
+
+      &.active {
+        color: #4db8ff;
+        background: rgb(40, 40, 40);
+        border-bottom-color: #4db8ff;
+      }
+    }
+  }
+
+  & .tab-content {
+    display: none;
+    padding: 1rem;
+
+    &.active {
+      display: block;
+    }
+
+    @media screen and (prefers-color-scheme: dark) {
+      background: rgb(40, 40, 40);
+    }
+  }
 }
 
 #global-settings,
 #page-controls,
 #domain-settings {
   margin-bottom: 1.5rem;
-}
 
-#global-settings:last-child,
-#page-controls:last-child,
-#domain-settings:last-child {
-  margin-bottom: 0;
-}
+  &:last-child {
+    margin-bottom: 0;
+  }
 
-#global-settings h3,
-#page-controls h3,
-#domain-settings h3 {
-  margin: 0 0 0.8rem 0;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #333;
+  & h3 {
+    margin: 0 0 0.8rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+
+    @media screen and (prefers-color-scheme: dark) {
+      color: #f0f0f0;
+    }
+  }
 }
 
 .domain-info {
@@ -83,6 +117,11 @@ html {
   background: rgba(0, 122, 204, 0.1);
   border-radius: 5px;
   border-left: 3px solid #007acc;
+
+  @media screen and (prefers-color-scheme: dark) {
+    background: rgba(77, 184, 255, 0.15);
+    border-left-color: #4db8ff;
+  }
 }
 
 #current-domain {
@@ -90,6 +129,10 @@ html {
   font-size: 0.9em;
   color: #007acc;
   font-weight: 500;
+
+  @media screen and (prefers-color-scheme: dark) {
+    color: #4db8ff;
+  }
 }
 
 .domain-controls {
@@ -100,8 +143,6 @@ html {
 
 #save-domain-override,
 #clear-domain-override {
-  background: #007acc;
-  color: white;
   border: none;
   border-radius: 5px;
   padding: 0.5em 1em;
@@ -110,186 +151,185 @@ html {
   transition: background 0.2s ease;
 }
 
+#save-domain-override {
+  background: #007acc;
+  color: white;
+
+  &:hover {
+    background: #0056b3;
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+}
+
 #clear-domain-override {
   background: #dc3545;
+
+  &:hover {
+    background: #c82333;
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
 }
 
-#save-domain-override:hover {
-  background: #0056b3;
-}
-
-#clear-domain-override:hover {
-  background: #c82333;
-}
-
-#save-domain-override:active,
-#clear-domain-override:active {
-  transform: translateY(1px);
-}
 header {
   display: flex;
   align-items: center;
   padding: 0.1rem 1rem;
+
+  & :first-child {
+    flex: 1;
+  }
+
+  & h1 {
+    font-size: 1.3rem;
+  }
+
+  & img {
+    width: 1.8rem;
+    height: 1.8rem;
+    margin-left: 0.8em;
+    vertical-align: middle;
+
+    @media screen and (prefers-color-scheme: dark) {
+      filter: invert();
+    }
+  }
 }
-header :first-child {
-  flex: 1;
-}
-header h1 {
-  font-size: 1.3rem;
-}
-header img {
-  width: 1.8rem;
-  height: 1.8rem;
-  margin-left: 0.8em;
-  vertical-align: middle;
-}
+
 #elements-list,
 #all-elements,
 #individual-elements,
 .info {
   background: rgb(250, 250, 250);
-  list-style-type: none;
   margin: 0;
   padding: 0;
+
+  @media screen and (prefers-color-scheme: dark) {
+    background: rgb(40, 40, 40);
+    border-color: rgb(70, 70, 70);
+  }
 }
-#individual-elements summary {
-  margin-bottom: 0.6rem;
-}
-#elements-list li,
-#all-elements,
+
 #individual-elements {
+  & summary {
+    margin-bottom: 0.6rem;
+  }
+
+  & li {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+#elements-list {
+  list-style-type: none;
+
+  & li {
+    margin: 0;
+    padding: 1rem 1rem 0.6rem;
+    border-bottom: 1px solid rgb(235, 235, 235);
+
+    &:last-child {
+      border-bottom-width: 0;
+    }
+  }
+}
+
+#all-elements {
   margin: 0;
   padding: 1rem 1rem 0.6rem;
   border-bottom: 1px solid rgb(235, 235, 235);
 }
-#individual-elements li {
-  padding-left: 0;
-  padding-right: 0;
-}
-#elements-list li:last-child {
-  border-bottom-width: 0;
-}
+
 .element-label {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
   max-width: 280px;
 }
+
 .element-not-playing {
   opacity: 0.5;
 }
+
 .checkboxes {
   display: flex;
   align-items: center;
+
+  & label {
+    margin-right: 0.8rem;
+  }
 }
-.checkboxes label {
-  margin-right: 0.8rem;
-}
+
 label {
   display: flex;
   padding: 0.2rem 0;
+
+  & span {
+    min-width: 10%;
+    padding: 0 0.3rem 0.1rem;
+    line-height: 2rem;
+
+    &:first-child {
+      min-width: 3.6rem;
+      text-align: right;
+    }
+  }
+
+  & input:not([type="checkbox"]) {
+    flex: 1;
+  }
+
+  & input[type="number"],
+  & .element-reset {
+    background: transparent;
+    color: inherit;
+    border-radius: 5px;
+    border: 1px solid #aaa;
+    padding: 0.2em 0.5em;
+  }
+
+  & input[type="number"] {
+    flex-grow: 0;
+    width: 7em;
+    margin-left: 0.5em;
+  }
+
+  & .element-reset:focus {
+    outline: 1px solid;
+  }
+
+  & .element-reset:active {
+    background: rgba(69, 69, 69, 0.3);
+  }
 }
+
 li > label:first-of-type {
   margin-top: 0.2rem;
 }
-label span {
-  min-width: 10%;
-  padding: 0 0.3rem 0.1rem;
-  line-height: 2rem;
-}
-label span:first-child {
-  min-width: 3.6rem;
-  text-align: right;
-}
-label input:not([type="checkbox"]) {
-  flex: 1;
-}
-label input[type="number"],
-.element-reset {
-  background: transparent;
-  color: inherit;
-  border-radius: 5px;
-  border: 1px solid #aaa;
-  padding: 0.2em 0.5em;
-}
-label input[type="number"] {
-  flex-grow: 0;
-  width: 7em;
-  margin-left: 0.5em;
-}
-.element-reset:focus {
-  outline: 1px solid;
-}
-.element-reset:active {
-  background: rgba(69, 69, 69, 0.3);
-}
+
 .header-row {
   display: flex;
   align-content: space-between;
   align-items: baseline;
   margin-bottom: 0.2em;
-}
-.header-row > :first-child {
-  flex: 1;
+
+  & > :first-child {
+    flex: 1;
+  }
 }
 
 .info {
   font-size: 0.8em;
   color: #666;
   padding: 1rem;
-}
 
-@media screen and (prefers-color-scheme: dark) {
-  body,
-  html {
-    background: rgb(60, 60, 60);
-    color: rgb(240, 240, 240);
-  }
-  header img {
-    filter: invert();
-  }
-  #elements-list,
-  #all-elements,
-  #individual-elements,
-  .tab-container,
-  .info {
-    background: rgb(40, 40, 40);
-  }
-  #elements-list li,
-  #all-elements,
-  #individual-elements,
-  .tab-container,
-  .tab-buttons {
-    border-color: rgb(70, 70, 70);
-  }
-  .tab-button {
-    color: #ccc;
-  }
-  .tab-button:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: white;
-  }
-  .tab-button.active {
-    color: #4db8ff;
-    background: rgb(40, 40, 40);
-    border-bottom-color: #4db8ff;
-  }
-  .tab-content {
-    background: rgb(40, 40, 40);
-  }
-  #global-settings h3,
-  #page-controls h3,
-  #domain-settings h3 {
-    color: #f0f0f0;
-  }
-  .domain-info {
-    background: rgba(77, 184, 255, 0.15);
-    border-left-color: #4db8ff;
-  }
-  #current-domain {
-    color: #4db8ff;
-  }
-  .info {
+  @media screen and (prefers-color-scheme: dark) {
     color: #aaa;
   }
 }

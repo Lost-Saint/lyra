@@ -14,6 +14,13 @@
     "48": "assets/icons/icon.svg"
   },
   "permissions": ["activeTab", "webNavigation", "storage"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["popup.js"],
+      "all_frames": true
+    }
+  ],
   "browser_action": {
     "default_icon": "assets/icons/icon.svg",
     "default_title": "Lyra",

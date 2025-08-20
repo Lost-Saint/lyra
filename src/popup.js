@@ -359,7 +359,17 @@ async function initializePopup() {
 			return result
 		})()`,
                     })
-                    .then((result) => frameMap.set(fid, result[0]))
+                    .then((result) => {
+                        if (result && result[0] instanceof Map) {
+                            frameMap.set(fid, result[0]);
+                        } else {
+                            console.warn(
+                                `Frame ${fid} returned invalid data:`,
+                                result,
+                            );
+                            frameMap.set(fid, new Map()); // Empty map as fallback
+                        }
+                    })
                     .catch((err) =>
                         console.error(`tab ${tid} frame ${fid}`, err),
                     );
@@ -604,7 +614,7 @@ async function initializePopup() {
                             `[data-fid="${fid}"][data-elid="${elid}"] .element-flip`,
                         ).checked = false;
                         applySettings(fid, elid, {
-                            gain: effectiveGain,
+                            gain: 1,
                             pan: 0,
                             mono: false,
                             flip: false,
@@ -624,5 +634,4 @@ async function initializePopup() {
     }
 }
 
-// Initialize the popup
 initializePopup();

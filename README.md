@@ -35,6 +35,8 @@ lyra/
 ├── manifest.json        # Firefox extension manifest
 ├── manifest.chrome.json # Chrome extension manifest
 ├── build.sh            # Build script for packaging
+├── cleanup.sh          # Advanced cleanup script with options
+├── cleanup-simple.sh   # Simple cleanup script
 └── README.md           # This file
 ```
 
@@ -62,6 +64,47 @@ The extension can be built for both Firefox and Chrome-based browsers using the 
 3. The built extensions will be available in the `build` directory:
    - Firefox: `build/lyra-firefox-[version].xpi`
    - Chrome: `build/lyra-chrome-[version].zip`
+
+## Cleaning Build Artifacts
+
+Two cleanup scripts are provided to remove build artifacts and temporary files:
+
+### Advanced Cleanup Script
+
+The main cleanup script (`cleanup.sh`) provides several options:
+
+```bash
+# Standard cleanup
+./cleanup.sh
+
+# Show what would be removed (dry run)
+./cleanup.sh --dry-run
+
+# Verbose output showing all operations
+./cleanup.sh --verbose
+
+# Force cleanup without confirmation prompts
+./cleanup.sh --force
+
+# Show help and all options
+./cleanup.sh --help
+```
+
+### Simple Cleanup Script
+
+For a basic cleanup without options, use:
+
+```bash
+./cleanup-simple.sh
+```
+
+Both scripts will remove:
+- The entire `build` directory
+- Generated package files (`.xpi`, `.zip`)
+- Temporary files (`.tmp`, `.log`)
+- OS-specific files (`.DS_Store`, `Thumbs.db`)
+- Editor backup files (`*~`, `.bak`, `.swp`, `.swo`)
+- Node modules directory (if present)
 
 ## Installation
 
