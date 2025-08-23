@@ -216,6 +216,8 @@ header {
 }
 
 #individual-elements {
+  padding: 1rem 1rem 0.6rem;
+
   & summary {
     margin-bottom: 0.6rem;
   }
