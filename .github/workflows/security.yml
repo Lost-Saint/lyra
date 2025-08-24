@@ -1,0 +1,298 @@
+name: Security & Dependencies
+
+on:
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+  push:
+    paths:
+      - 'package*.json'
+      - 'manifest*.json'
+
+jobs:
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install dependencies
+      run: |
+        if [ -f "package.json" ]; then
+          npm ci || npm install
+        else
+          echo "No package.json found, skipping npm install"
+        fi
+      continue-on-error: true
+
+    - name: Run npm audit
+      run: |
+        if [ -f "package.json" ]; then
+          npm audit --audit-level=moderate || echo "Audit found issues - review required"
+        fi
+      continue-on-error: true
+
+    - name: Scan source code for vulnerabilities
+      run: |
+        echo "Scanning for common security issues..."
+
+        # Check for eval usage
+        if find src -name "*.js" -exec grep -H "eval(" {} \; | head -10; then
+          echo "⚠️ Warning: Found eval() usage - potential security risk"
+        fi
+
+        # Check for innerHTML usage without sanitization
+        if find src -name "*.js" -exec grep -H "innerHTML\s*=" {} \; | head -10; then
+          echo "⚠️ Warning: Found innerHTML usage - ensure content is sanitized"
+        fi
+
+        # Check for document.write usage
+        if find src -name "*.js" -exec grep -H "document\.write" {} \; | head -10; then
+          echo "⚠️ Warning: Found document.write usage - potential XSS risk"
+        fi
+
+        # Check for external script loading
+        if find src -name "*.js" -exec grep -H -E "(https?://|//)" {} \; | head -10; then
+          echo "⚠️ Warning: Found potential external resource references"
+        fi
+
+    - name: Check Content Security Policy
+      run: |
+        if grep -q "content_security_policy" manifest*.json; then
+          echo "✓ Content Security Policy found in manifest"
+          grep -A 5 "content_security_policy" manifest*.json
+        else
+          echo "⚠️ Warning: No Content Security Policy found - consider adding one"
+        fi
+
+    - name: Validate permissions
+      run: |
+        echo "Checking extension permissions..."
+
+        # Extract and display permissions
+        permissions=$(grep -A 20 '"permissions"' manifest.json | grep -E '^\s*"[^"]*"' | tr -d ' ",' || echo "No permissions found")
+
+        echo "Current permissions:"
+        echo "$permissions"
+
+        # Check for overly broad permissions
+        if echo "$permissions" | grep -q "://\*/\*"; then
+          echo "⚠️ Warning: Extension has very broad URL permissions"
+        fi
+
+        if echo "$permissions" | grep -q "<all_urls>"; then
+          echo "⚠️ Warning: Extension requests access to all URLs"
+        fi
+
+  manifest-validation:
+    name: Validate Manifests
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Validate Firefox manifest
+      run: |
+        echo "Validating Firefox manifest (manifest.json)..."
+
+        # Check JSON syntax
+        if ! python3 -m json.tool manifest.json > /dev/null; then
+          echo "❌ Error: manifest.json is not valid JSON"
+          exit 1
+        fi
+
+        # Check required fields for Firefox
+        required_fields=("manifest_version" "name" "version")
+        for field in "${required_fields[@]}"; do
+          if ! grep -q "\"$field\"" manifest.json; then
+            echo "❌ Error: Required field '$field' missing from manifest.json"
+            exit 1
+          fi
+        done
+
+        # Check manifest version
+        manifest_version=$(grep '"manifest_version"' manifest.json | grep -o '[0-9]*')
+        if [ "$manifest_version" != "2" ] && [ "$manifest_version" != "3" ]; then
+          echo "⚠️ Warning: Unusual manifest version: $manifest_version"
+        fi
+
+        echo "✓ Firefox manifest is valid"
+
+    - name: Validate Chrome manifest
+      run: |
+        if [ -f "manifest.chrome.json" ]; then
+          echo "Validating Chrome manifest (manifest.chrome.json)..."
+
+          # Check JSON syntax
+          if ! python3 -m json.tool manifest.chrome.json > /dev/null; then
+            echo "❌ Error: manifest.chrome.json is not valid JSON"
+            exit 1
+          fi
+
+          # Check Chrome-specific requirements
+          if grep -q '"manifest_version": 3' manifest.chrome.json; then
+            # Manifest V3 specific checks
+            if grep -q '"browser_action"' manifest.chrome.json; then
+              echo "⚠️ Warning: Manifest V3 should use 'action' instead of 'browser_action'"
+            fi
+
+            if grep -q '"background".*"scripts"' manifest.chrome.json; then
+              echo "⚠️ Warning: Manifest V3 should use service workers instead of background scripts"
+            fi
+          fi
+
+          echo "✓ Chrome manifest is valid"
+        else
+          echo "ℹ️ No Chrome-specific manifest found"
+        fi
+
+  file-integrity:
+    name: File Integrity Check
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Check for required files
+      run: |
+        echo "Checking file integrity..."
+
+        # Check that all files referenced in manifests exist
+        echo "Files referenced in manifest.json:"
+
+        # Extract and check icon files
+        icon_files=$(grep -o '"[^"]*\.svg"' manifest.json | tr -d '"' || echo "")
+        for file in $icon_files; do
+          if [ ! -f "$file" ]; then
+            echo "⚠️ Warning: Icon file referenced but missing: $file"
+          else
+            echo "✓ $file exists"
+          fi
+        done
+
+        # Check content scripts
+        content_scripts=$(grep -A 10 '"content_scripts"' manifest.json | grep -o '"[^"]*\.js"' | tr -d '"' || echo "")
+        for file in $content_scripts; do
+          if [ ! -f "$file" ]; then
+            echo "❌ Error: Content script referenced but missing: $file"
+            exit 1
+          else
+            echo "✓ $file exists"
+          fi
+        done
+
+        # Check popup files
+        popup_files=$(grep -E '"default_popup"|"popup"' manifest.json | grep -o '"[^"]*\.html"' | tr -d '"' || echo "")
+        for file in $popup_files; do
+          if [ ! -f "$file" ]; then
+            echo "❌ Error: Popup file referenced but missing: $file"
+            exit 1
+          else
+            echo "✓ $file exists"
+          fi
+        done
+
+    - name: Check file permissions
+      run: |
+        echo "Checking file permissions..."
+
+        # Check that script files are not executable (security best practice)
+        find src -name "*.js" -perm +111 -exec echo "⚠️ Warning: JavaScript file is executable: {}" \;
+
+        # Check for world-writable files
+        find . -type f -perm -002 -exec echo "⚠️ Warning: World-writable file found: {}" \;
+
+        echo "File permission check complete"
+
+  code-quality:
+    name: Code Quality Check
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Check JavaScript quality
+      run: |
+        echo "Checking JavaScript code quality..."
+
+        # Check for common issues
+        js_files=$(find src -name "*.js")
+
+        for file in $js_files; do
+          echo "Checking $file..."
+
+          # Check for console.log statements
+          if grep -n "console\.log" "$file"; then
+            echo "⚠️ Warning: console.log found in $file - consider removing for production"
+          fi
+
+          # Check for alert statements
+          if grep -n "alert(" "$file"; then
+            echo "⚠️ Warning: alert() found in $file - consider using proper UI"
+          fi
+
+          # Check for TODO/FIXME comments
+          if grep -n -i "todo\|fixme" "$file"; then
+            echo "ℹ️ Info: TODO/FIXME comments found in $file"
+          fi
+        done
+
+    - name: Check HTML quality
+      run: |
+        echo "Checking HTML code quality..."
+
+        html_files=$(find src -name "*.html")
+
+        for file in $html_files; do
+          echo "Checking $file..."
+
+          # Check for missing lang attribute
+          if ! grep -q 'lang=' "$file"; then
+            echo "⚠️ Warning: Missing lang attribute in $file"
+          fi
+
+          # Check for inline scripts (potential CSP issue)
+          if grep -q '<script[^>]*>' "$file" | grep -v 'src='; then
+            echo "⚠️ Warning: Inline script found in $file - may violate CSP"
+          fi
+
+          # Check for inline styles
+          if grep -q 'style=' "$file"; then
+            echo "⚠️ Warning: Inline styles found in $file - consider using CSS files"
+          fi
+        done
+
+  notification:
+    name: Notification
+    runs-on: ubuntu-latest
+    needs: [security-audit, manifest-validation, file-integrity, code-quality]
+    if: always()
+
+    steps:
+    - name: Report status
+      run: |
+        echo "Security scan completed:"
+        echo "- Security audit: ${{ needs.security-audit.result }}"
+        echo "- Manifest validation: ${{ needs.manifest-validation.result }}"
+        echo "- File integrity: ${{ needs.file-integrity.result }}"
+        echo "- Code quality: ${{ needs.code-quality.result }}"
+
+        if [ "${{ needs.security-audit.result }}" = "failure" ] ||
+           [ "${{ needs.manifest-validation.result }}" = "failure" ] ||
+           [ "${{ needs.file-integrity.result }}" = "failure" ]; then
+          echo "❌ Some security checks failed - review required"
+          exit 1
+        else
+          echo "✅ All security checks passed"
+        fi
